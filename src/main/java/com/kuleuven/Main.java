@@ -77,9 +77,9 @@ public class Main {
         sootup.callgraph.CallGraph cg =
                 cgAlgorithm.initialize(Collections.singletonList(methodSignature));
 
-        try (FileWriter writer = new FileWriter(outputFile)) {
+        try (FileWriter writer = new FileWriter("out/" + outputFile)) {
             writer.write(cg.exportAsDot());
-            System.out.println("✅ DOT file written to " + outputFile);
+            System.out.println("✅ DOT file written to out/" + outputFile);
         } catch (IOException e) {
             e.printStackTrace();
         }
