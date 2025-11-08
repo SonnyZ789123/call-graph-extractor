@@ -14,51 +14,72 @@ import sootup.java.core.views.JavaView;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Main {
     public static void main(String[] args) {
-        if (args.length < 4 || (!Objects.equals(args[2], "cha") && !Objects.equals(args[2], "rta"))) {
-            System.out.println("Need arguments: <classPath> <mainClass> <algorithm> <outputFile>");
-            System.out.println("Example: ./target/classes com.kuleuven.library.Main (cha|rta) graph.dot");
+
+        System.out.println(Arrays.stream(args).toList());
+
+        // ✅ Require 4 args: classPath, className, algorithm, entry method
+        if (args.length < 4) {
+            System.out.println("Usage: java -cp <jar> com.kuleuven.Main <classPath> <mainClass> \"<entryMethodSignature>\" <cha|rta>");
+            System.out.println("Example: java -cp target/myjar.jar com.kuleuven.Main ./target/classes com.kuleuven.library.Main \"void main(java.lang.String[])\"");
             return;
         }
 
         String classPath = args[0];
         String mainClassName = args[1];
-        String algorithmChoice = args[2].toLowerCase();
-        String outputFile = args[3];
+        String entryMethodSignature = args[2]; // e.g. "void main(java.lang.String[])"
+        String algorithmChoice = args[3].toLowerCase();
 
-        AnalysisInputLocation inputLocation =
-                new JavaClassPathAnalysisInputLocation(classPath);
+        if (!algorithmChoice.equals("cha") && !algorithmChoice.equals("rta")) {
+            System.err.println("❌ Unknown algorithm: " + algorithmChoice);
+            return;
+        }
 
+        // Parse entrySignature
+        String returnType = entryMethodSignature.substring(0, entryMethodSignature.indexOf(' ')).trim();
+        String afterReturn = entryMethodSignature.substring(entryMethodSignature.indexOf(' ') + 1).trim();
+        String methodName = afterReturn.substring(0, afterReturn.indexOf('(')).trim();
+        String paramList = afterReturn.substring(afterReturn.indexOf('(') + 1, afterReturn.indexOf(')')).trim();
+
+        List<String> parameters;
+        if (paramList.isEmpty()) {
+            parameters = Collections.emptyList();
+        } else {
+            parameters = Arrays.stream(paramList.split(","))
+                    .map(String::trim)
+                    .collect(Collectors.toList());
+        }
+
+        AnalysisInputLocation inputLocation = new JavaClassPathAnalysisInputLocation(classPath);
         JavaView view = new JavaView(inputLocation);
 
-        JavaClassType classType =
-                view.getIdentifierFactory().getClassType(mainClassName);
-
+        JavaClassType classType = view.getIdentifierFactory().getClassType(mainClassName);
         Optional<JavaSootClass> maybeClass = view.getClass(classType);
+
         if (maybeClass.isEmpty()) {
-            System.err.println("Error: Could not load class " + mainClassName);
+            System.err.println("❌ Could not load class " + mainClassName);
             return;
         }
 
         JavaSootClass sootClass = maybeClass.get();
 
+        // ✅ Create entry method signature
         MethodSignature methodSignature = view.getIdentifierFactory().getMethodSignature(
                 classType,
-                "main",
-                "void",
-                Collections.singletonList("java.lang.String[]")
+                methodName,
+                returnType,
+                parameters
         );
 
         MethodSubSignature mss = methodSignature.getSubSignature();
         Optional<JavaSootMethod> opt = sootClass.getMethod(mss);
 
         if (opt.isEmpty()) {
-            System.err.println("Error: Could not find main(String[]) in " + mainClassName);
+            System.err.println("❌ Method not found: " + entryMethodSignature);
             return;
         }
 
@@ -77,9 +98,13 @@ public class Main {
         sootup.callgraph.CallGraph cg =
                 cgAlgorithm.initialize(Collections.singletonList(methodSignature));
 
-        try (FileWriter writer = new FileWriter("out/" + outputFile)) {
-            writer.write(cg.exportAsDot());
-            System.out.println("✅ DOT file written to out/" + outputFile);
+        try {
+            new java.io.File("out").mkdirs();
+            String filename = "out/graph_raw.dot";
+            try (FileWriter writer = new FileWriter(filename)) {
+                writer.write(cg.exportAsDot());
+                System.out.println("✅ DOT file written to " + filename);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -63,6 +63,7 @@ strict digraph ObjectGraph {
 	"<com.kuleuven.library.domain.LibraryItem: java.lang.String getDescription()>" -> "<com.kuleuven.library.domain.Magazine: java.lang.String getType()>";
 	"<com.kuleuven.library.domain.LibraryItem: java.lang.String getFullDetails()>" -> "<com.kuleuven.library.domain.Book: java.lang.String getFormattedMetadata()>";
 	"<com.kuleuven.library.domain.LibraryItem: java.lang.String getFullDetails()>" -> "<com.kuleuven.library.domain.Book: java.lang.String getType()>";
+	"<com.kuleuven.library.domain.LibraryItem: java.lang.String getFullDetails()>" -> "<com.kuleuven.library.domain.LibraryItem: java.lang.String getFormattedMetadata()>";
 	"<com.kuleuven.library.domain.LibraryItem: java.lang.String getFullDetails()>" -> "<com.kuleuven.library.domain.Magazine: java.lang.String getFormattedMetadata()>";
 	"<com.kuleuven.library.domain.LibraryItem: java.lang.String getFullDetails()>" -> "<com.kuleuven.library.domain.Magazine: java.lang.String getType()>";
 	"<com.kuleuven.library.domain.Magazine: void <init>(java.lang.String,java.lang.String,int,int,double)>" -> "<com.kuleuven.library.domain.LibraryItem: void <init>(java.lang.String,java.lang.String,int,double)>";
