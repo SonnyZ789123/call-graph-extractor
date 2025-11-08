@@ -1,5 +1,6 @@
 package com.kuleuven;
 
+import sootup.callgraph.CallGraph;
 import sootup.callgraph.CallGraphAlgorithm;
 import sootup.callgraph.ClassHierarchyAnalysisAlgorithm;
 import sootup.callgraph.RapidTypeAnalysisAlgorithm;
@@ -26,7 +27,7 @@ public class Main {
         if (args.length < 4) {
             System.out.println("Usage: java -cp <jar> com.kuleuven.Main <classPath> <mainClass> \"<entryMethodSignature>\" <cha|rta>");
             System.out.println("Example: java -cp target/myjar.jar com.kuleuven.Main ./target/classes com.kuleuven.library.Main \"void main(java.lang.String[])\"");
-            return;
+            System.exit(1);;
         }
 
         String classPath = args[0];
@@ -36,7 +37,7 @@ public class Main {
 
         if (!algorithmChoice.equals("cha") && !algorithmChoice.equals("rta")) {
             System.err.println("❌ Unknown algorithm: " + algorithmChoice);
-            return;
+            System.exit(1);
         }
 
         // Parse entrySignature
@@ -62,7 +63,7 @@ public class Main {
 
         if (maybeClass.isEmpty()) {
             System.err.println("❌ Could not load class " + mainClassName);
-            return;
+            System.exit(1);
         }
 
         JavaSootClass sootClass = maybeClass.get();
@@ -80,7 +81,7 @@ public class Main {
 
         if (opt.isEmpty()) {
             System.err.println("❌ Method not found: " + entryMethodSignature);
-            return;
+            System.exit(1);
         }
 
         CallGraphAlgorithm cgAlgorithm;
@@ -92,21 +93,24 @@ public class Main {
                 cgAlgorithm = new RapidTypeAnalysisAlgorithm(view);
                 break;
             default:
+                System.exit(1);
                 return;
         }
 
-        sootup.callgraph.CallGraph cg =
-                cgAlgorithm.initialize(Collections.singletonList(methodSignature));
-
         try {
+            CallGraph cg =
+                    cgAlgorithm.initialize(Collections.singletonList(methodSignature));
+
             new java.io.File("out").mkdirs();
+
             String filename = "out/graph_raw.dot";
             try (FileWriter writer = new FileWriter(filename)) {
                 writer.write(cg.exportAsDot());
                 System.out.println("✅ DOT file written to " + filename);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("❌ Call graph generation failed.");
+            System.exit(1);
         }
     }
 }
