@@ -105,7 +105,7 @@ public class Main {
 
             String filename = "out/graph_raw.dot";
             try (FileWriter writer = new FileWriter(filename)) {
-                writer.write(cg.exportAsDot());
+                writer.write(cg.exportAsDot().collect(Collectors.joining(System.lineSeparator())));
                 System.out.println("✅ DOT file written to " + filename);
             }
         } catch (IOException e) {
