@@ -129,7 +129,7 @@ public class Main {
             }
 
             // Write PageRank scores to a text file
-            String scoreFilename = "out/pagerank_scores.txt";
+            String scoreFilename = "out/scores.txt";
             try (FileWriter writer = new FileWriter(scoreFilename)) {
                 for (Map.Entry<MethodSignature, Double> entry : pageRankScores.entrySet()) {
                     writer.write(entry.getKey().toString() + " | " + entry.getValue() + System.lineSeparator());
