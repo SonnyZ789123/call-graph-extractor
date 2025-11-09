@@ -17,9 +17,6 @@ public class PageRank {
     // Stores the final PageRank score for each method in the call graph.
     private final Map<MethodSignature, Double> pageRankScores = new HashMap<>();
 
-    // The call graph to analyze (directed graph of method calls).
-    private final CallGraph callGraph;
-
     // Maximum number of PageRank iterations (upper bound to prevent infinite loops).
     private static final int MAX_ITERATIONS = 100;
 
@@ -29,17 +26,15 @@ public class PageRank {
     // Minimum change required between iterations to consider convergence.
     private static final double TOLERANCE = 1.0e-6;
 
-    public PageRank(CallGraph callGraph) {
-        this.callGraph = callGraph;
-    }
+    public PageRank() {}
 
     /**
      * Returns the PageRank score for a given method.
      * The PageRank computation is performed lazily on first request.
      */
-    public double calculateRank(MethodSignature node) {
+    public double calculateRank(MethodSignature node, CallGraph callGraph) {
         if (pageRankScores.isEmpty()) {
-            computePageRank();
+            computePageRank(callGraph);
         }
         return pageRankScores.getOrDefault(node, 0.0);
     }
@@ -49,7 +44,7 @@ public class PageRank {
      * This treats the call graph as a directed graph where edges represent "method A calls B".
      * Methods with many important callers receive higher PageRank.
      */
-    private void computePageRank() {
+    private void computePageRank(CallGraph callGraph) {
 
         // Collect all methods (nodes) in the call graph.
         Set<MethodSignature> nodes = callGraph.getMethodSignatures();
