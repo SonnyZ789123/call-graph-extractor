@@ -1,5 +1,6 @@
 package com.kuleuven;
 
+import com.kuleuven.metrics.PageRank;
 import sootup.callgraph.CallGraph;
 import sootup.callgraph.CallGraphAlgorithm;
 import sootup.callgraph.ClassHierarchyAnalysisAlgorithm;
@@ -111,6 +112,10 @@ public class Main {
             // Build the call graph starting from the given entry method
             CallGraph cg = cgAlgorithm.initialize(Collections.singletonList(methodSignature));
 
+            // Gives the nodes a score based on PageRank algorithm
+            PageRank pageRank = new PageRank();
+            Map<MethodSignature, Double> pageRankScores = pageRank.computePageRank(cg);
+
             // Ensure output directory exists
             new java.io.File("out").mkdirs();
 
@@ -121,6 +126,15 @@ public class Main {
                         cg.exportAsDot().collect(Collectors.joining(System.lineSeparator()))
                 );
                 System.out.println("✅ DOT file written to " + filename);
+            }
+
+            // Write PageRank scores to a text file
+            String scoreFilename = "out/pagerank_scores.txt";
+            try (FileWriter writer = new FileWriter(scoreFilename)) {
+                for (Map.Entry<MethodSignature, Double> entry : pageRankScores.entrySet()) {
+                    writer.write(entry.getKey().toString() + " | " + entry.getValue() + System.lineSeparator());
+                }
+                System.out.println("✅ PageRank scores written to " + scoreFilename);
             }
 
         } catch (IOException e) {

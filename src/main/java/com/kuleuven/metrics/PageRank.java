@@ -26,7 +26,8 @@ public class PageRank {
     // Minimum change required between iterations to consider convergence.
     private static final double TOLERANCE = 1.0e-6;
 
-    public PageRank() {}
+    public PageRank() {
+    }
 
     /**
      * Returns the PageRank score for a given method.
@@ -44,7 +45,7 @@ public class PageRank {
      * This treats the call graph as a directed graph where edges represent "method A calls B".
      * Methods with many important callers receive higher PageRank.
      */
-    private void computePageRank(CallGraph callGraph) {
+    public Map<MethodSignature, Double> computePageRank(CallGraph callGraph) {
 
         // Collect all methods (nodes) in the call graph.
         Set<MethodSignature> nodes = callGraph.getMethodSignatures();
@@ -113,5 +114,7 @@ public class PageRank {
 
         pageRankScores.clear();
         pageRankScores.putAll(scores);
+
+        return pageRankScores;
     }
 }
