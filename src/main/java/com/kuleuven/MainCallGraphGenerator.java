@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class Main {
+public class MainCallGraphGenerator {
 
     public static void main(String[] args) {
         /*
