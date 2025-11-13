@@ -28,45 +28,69 @@ public class MainCallGraphGenerator {
 
         String classPath = args[0];
         String mainClassName = args[1];
-        String entryMethodSignature = args[2]; // Example: "void main(java.lang.String[])"
+        String entryMethodSignature = args[2];
         String algorithmChoice = args[3].toLowerCase();
 
         try {
-            ExtractCallGraph extractor = new ExtractCallGraph();
-
-            CallGraphConstructionAlgorithm cgAlgorithm = CallGraphConstructionAlgorithm.fromString(algorithmChoice);
-
-            // Build the call graph starting from the given entry method
-            CallGraph cg = extractor.extract(classPath, mainClassName, entryMethodSignature, cgAlgorithm);
-
-            // Ensure output directory exists
-            new java.io.File("out").mkdirs();
-
-            // Write DOT graph representation
-            String filename = "out/graph_raw.dot";
-            try (FileWriter writer = new FileWriter(filename)) {
-                writer.write(
-                        cg.exportAsDot().collect(Collectors.joining(System.lineSeparator()))
-                );
-                System.out.println("✅ DOT file written to " + filename);
-            }
-
-            // Gives the nodes a score based on PageRank algorithm
-            PageRank pageRank = new PageRank();
-            Map<MethodSignature, Double> pageRankScores = pageRank.computePageRank(cg);
-
-            // Write PageRank scores to a text file
-            String scoreFilename = "out/scores.txt";
-            try (FileWriter writer = new FileWriter(scoreFilename)) {
-                for (Map.Entry<MethodSignature, Double> entry : pageRankScores.entrySet()) {
-                    writer.write(entry.getKey().toString() + " | " + entry.getValue() + System.lineSeparator());
-                }
-                System.out.println("✅ PageRank scores written to " + scoreFilename);
-            }
-
+            CallGraph cg = buildCallGraph(classPath, mainClassName, entryMethodSignature, algorithmChoice);
+            writeOutputs(cg);
         } catch (IOException e) {
-            System.err.println("❌ Call graph generation failed.");
+            System.err.println("❌ Call graph generation failed: " + e.getMessage());
             System.exit(1);
+        }
+    }
+
+    /**
+     * Builds a call graph from the given parameters.
+     *
+     * @param classPath The classpath to analyze (compiled .class files or jars)
+     * @param mainClassName Fully-qualified class name containing the entry method
+     * @param entryMethodSignature Signature of the entry method (e.g. "void main(java.lang.String[])")
+     * @param algorithmChoice Call graph construction algorithm ("cha", "rta", etc.)
+     * @return The constructed CallGraph
+     * @throws IOException If extraction fails
+     */
+    public static CallGraph buildCallGraph(String classPath,
+                                           String mainClassName,
+                                           String entryMethodSignature,
+                                           String algorithmChoice) throws IOException {
+        ExtractCallGraph extractor = new ExtractCallGraph();
+        CallGraphConstructionAlgorithm cgAlgorithm = CallGraphConstructionAlgorithm.fromString(algorithmChoice);
+
+        return extractor.extract(classPath, mainClassName, entryMethodSignature, cgAlgorithm);
+    }
+
+    /**
+     * Writes the call graph and its PageRank scores to the output directory.
+     *
+     * @param cg The generated CallGraph
+     * @throws IOException If writing fails
+     */
+    public static void writeOutputs(CallGraph cg) throws IOException {
+        // Ensure output directory exists
+        java.io.File outDir = new java.io.File("out");
+        outDir.mkdirs();
+
+        // Write DOT graph representation
+        String filename = "out/graph_raw.dot";
+        try (FileWriter writer = new FileWriter(filename)) {
+            writer.write(
+                    cg.exportAsDot().collect(Collectors.joining(System.lineSeparator()))
+            );
+            System.out.println("✅ DOT file written to " + filename);
+        }
+
+        // Compute PageRank
+        PageRank pageRank = new PageRank();
+        Map<MethodSignature, Double> pageRankScores = pageRank.computePageRank(cg);
+
+        // Write PageRank scores
+        String scorePath = "out/scores.txt";
+        try (FileWriter writer = new FileWriter(scorePath)) {
+            for (Map.Entry<MethodSignature, Double> entry : pageRankScores.entrySet()) {
+                writer.write(entry.getKey().toString() + " | " + entry.getValue() + System.lineSeparator());
+            }
+            System.out.println("✅ Graph ranking written to " + scorePath);
         }
     }
 }
