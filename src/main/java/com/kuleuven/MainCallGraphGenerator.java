@@ -1,5 +1,7 @@
 package com.kuleuven;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.kuleuven.metrics.CallGraphConstructionAlgorithm;
 import com.kuleuven.metrics.PageRank;
 import sootup.callgraph.CallGraph;
@@ -83,14 +85,18 @@ public class MainCallGraphGenerator {
         // Compute PageRank
         PageRank pageRank = new PageRank();
         Map<MethodSignature, Double> pageRankScores = pageRank.computePageRank(cg);
+        Map<String, Double> stringKeyedScores = pageRankScores.entrySet().stream()
+                .collect(Collectors.toMap(
+                        e -> e.getKey().toString(),
+                        Map.Entry::getValue
+                ));
 
-        // Write PageRank scores
-        String scorePath = "out/scores.txt";
-        try (FileWriter writer = new FileWriter(scorePath)) {
-            for (Map.Entry<MethodSignature, Double> entry : pageRankScores.entrySet()) {
-                writer.write(entry.getKey().toString() + " | " + entry.getValue() + System.lineSeparator());
-            }
-            System.out.println("✅ Graph ranking written to " + scorePath);
+        // Write graph ranking
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+        try (FileWriter writer = new FileWriter("out/graph_ranking.json")) {
+            gson.toJson(stringKeyedScores, writer);
+            System.out.println("✅ Graph ranking written to out/graph_ranking.json");
         }
     }
 }
