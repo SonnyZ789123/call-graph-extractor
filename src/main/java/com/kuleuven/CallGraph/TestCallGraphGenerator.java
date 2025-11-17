@@ -1,4 +1,4 @@
-package com.kuleuven;
+package com.kuleuven.CallGraph;
 
 import com.kuleuven.metrics.CallGraphConstructionAlgorithm;
 import sootup.callgraph.CallGraph;
@@ -17,8 +17,8 @@ public class TestCallGraphGenerator {
          *   2: algorithm choice       ("cha" or "rta")
          */
         if (args.length < 3) {
-            System.out.println("Usage: java -cp <jar> com.kuleuven.TestCallGraphGenerator <classPath> <pathToTestClasses> <cha|rta>");
-            System.out.println("Example: java -cp target/myjar.jar com.kuleuven.TestCallGraphGenerator ./target/classes ./target/test-classes cha");
+            System.out.println("Usage: java -cp <jar> com.kuleuven.CallGraph.TestCallGraphGenerator <classPath> <pathToTestClasses> <cha|rta>");
+            System.out.println("Example: java -cp target/myjar.jar com.kuleuven.CallGraph.TestCallGraphGenerator ./target/classes ./target/test-classes cha");
             System.exit(1);
         }
 

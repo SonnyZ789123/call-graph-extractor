@@ -1,4 +1,4 @@
-package com.kuleuven;
+package com.kuleuven.CallGraph;
 
 import com.kuleuven.metrics.CallGraphConstructionAlgorithm;
 import sootup.callgraph.CallGraph;

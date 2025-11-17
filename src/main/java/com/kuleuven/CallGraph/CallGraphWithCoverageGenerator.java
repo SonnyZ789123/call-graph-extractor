@@ -1,4 +1,4 @@
-package com.kuleuven;
+package com.kuleuven.CallGraph;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -19,8 +19,8 @@ public class CallGraphWithCoverageGenerator {
          *   3: algorithm choice       ("cha" or "rta")
          */
         if (args.length < 4) {
-            System.out.println("Usage: java -cp <jar> com.kuleuven.MainCallGraphGenerator <classPath> <mainClass> \"<entryMethodSignature>\" <pathToTestClasses> <cha|rta>");
-            System.out.println("Example: java -cp target/myjar.jar com.kuleuven.MainCallGraphGenerator ./target/classes com.kuleuven.library.Main \"void main(java.lang.String[])\" ./target/test-classes cha");
+            System.out.println("Usage: java -cp <jar> com.kuleuven.CallGraph.MainCallGraphGenerator <classPath> <mainClass> \"<entryMethodSignature>\" <pathToTestClasses> <cha|rta>");
+            System.out.println("Example: java -cp target/myjar.jar com.kuleuven.CallGraph.MainCallGraphGenerator ./target/classes com.kuleuven.library.Main \"void main(java.lang.String[])\" ./target/test-classes cha");
             System.exit(1);
         }
 
