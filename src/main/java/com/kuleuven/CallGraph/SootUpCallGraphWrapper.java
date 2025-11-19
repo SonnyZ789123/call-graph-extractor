@@ -6,14 +6,19 @@ import sootup.core.signatures.MethodSignature;
 import java.util.Set;
 
 public class SootUpCallGraphWrapper implements ICallGraph<MethodSignature> {
-    CallGraph callGraph;
-    Set<MethodSignature> nodes;
-    Set<SootUpCallWrapper> edges;
+    private final CallGraph callGraph;
+    private final Set<MethodSignature> nodes;
+    private final Set<SootUpCallWrapper> edges;
 
     public SootUpCallGraphWrapper(CallGraph callGraph) {
+        ProjectMethodFilter filter = new ProjectMethodFilter();
         this.callGraph = callGraph;
-        this.nodes = callGraph.getMethodSignatures();
-        this.edges = callGraph.getCalls().stream()
+
+        Set<MethodSignature> methodSignatures = callGraph.getMethodSignatures();
+        Set<CallGraph.Call> calls = callGraph.getCalls();
+
+        this.nodes = filter.filterMethods(methodSignatures);
+        this.edges = filter.filterCalls(calls).stream()
                 .map(SootUpCallWrapper::new)
                 .collect(java.util.stream.Collectors.toSet());
     }
