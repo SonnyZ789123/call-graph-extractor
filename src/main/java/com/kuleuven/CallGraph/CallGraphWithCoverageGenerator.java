@@ -7,6 +7,8 @@ import sootup.callgraph.CallGraph;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CallGraphWithCoverageGenerator {
     public static void main(String[] args) {
@@ -17,10 +19,11 @@ public class CallGraphWithCoverageGenerator {
          *   2: entry method signature (e.g., "void main(java.lang.String[])")
          *   3: path to test classes   (e.g., "./target/test-classes")
          *   3: algorithm choice       ("cha" or "rta")
+         *   4: project prefixes       (optional, comma-separated, e.g., "com.kuleuven,org.example")
          */
         if (args.length < 4) {
-            System.out.println("Usage: java -cp <jar> com.kuleuven.CallGraph.MainCallGraphGenerator <classPath> <mainClass> \"<entryMethodSignature>\" <pathToTestClasses> <cha|rta>");
-            System.out.println("Example: java -cp target/myjar.jar com.kuleuven.CallGraph.MainCallGraphGenerator ./target/classes com.kuleuven.library.Main \"void main(java.lang.String[])\" ./target/test-classes cha");
+            System.out.println("Usage: java -cp <jar> com.kuleuven.CallGraph.MainCallGraphGenerator <classPath> <mainClass> \"<entryMethodSignature>\" <pathToTestClasses> <cha|rta> <projectPrefixes>");
+            System.out.println("Example: java -cp target/myjar.jar com.kuleuven.CallGraph.MainCallGraphGenerator ./target/classes com.kuleuven.library.Main \"void main(java.lang.String[])\" ./target/test-classes cha com.kuleuven,org.example");
             System.exit(1);
         }
 
@@ -29,13 +32,20 @@ public class CallGraphWithCoverageGenerator {
         String entryMethodSignature = args[2];
         String pathToTestClasses = args[3];
         String algorithmChoice = args[4].toLowerCase();
+        List<String> projectPrefixes = new ArrayList<>();
+        if (args.length >= 6) {
+            String[] prefixes = args[5].split(",");
+            for (String prefix : prefixes) {
+                projectPrefixes.add(prefix.trim());
+            }
+        }
 
         try {
             CallGraph cg = MainCallGraphGenerator.buildCallGraph(classPath, mainClassName, entryMethodSignature, algorithmChoice);
-            MainCallGraphGenerator.writeOutputs(cg);
+            MainCallGraphGenerator.writeOutputs(cg, projectPrefixes);
 
             CallGraph testCg = TestCallGraphGenerator.buildTestCallGraph(classPath, pathToTestClasses, algorithmChoice);
-            TestCallGraphGenerator.writeOutputs(testCg);
+            TestCallGraphGenerator.writeOutputs(testCg, projectPrefixes);
 
             CallGraphCoverage coverage = new CallGraphCoverage();
             CallGraphCoverage.CoverageResult coverageResult = coverage.calculateCoverage(cg, testCg);
