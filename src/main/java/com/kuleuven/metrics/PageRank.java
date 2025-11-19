@@ -5,17 +5,13 @@ https://github.com/olavblaak1/graph-based-coverage-improvement/blob/main/src/mai
 
 package com.kuleuven.metrics;
 
-import sootup.callgraph.CallGraph;
-import sootup.core.signatures.MethodSignature;
+import com.kuleuven.CallGraph.ICallGraph;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 public class PageRank {
-
-    // Stores the final PageRank score for each method in the call graph.
-    private final Map<MethodSignature, Double> pageRankScores = new HashMap<>();
 
     // Maximum number of PageRank iterations (upper bound to prevent infinite loops).
     private static final int MAX_ITERATIONS = 100;
@@ -30,42 +26,31 @@ public class PageRank {
     }
 
     /**
-     * Returns the PageRank score for a given method.
-     * The PageRank computation is performed lazily on first request.
-     */
-    public double calculateRank(MethodSignature node, CallGraph callGraph) {
-        if (pageRankScores.isEmpty()) {
-            computePageRank(callGraph);
-        }
-        return pageRankScores.getOrDefault(node, 0.0);
-    }
-
-    /**
      * Computes PageRank scores for all methods in the call graph.
      * This treats the call graph as a directed graph where edges represent "method A calls B".
      * Methods with many important callers receive higher PageRank.
      */
-    public Map<MethodSignature, Double> computePageRank(CallGraph callGraph) {
+    public <NodeType> Map<NodeType, Double> computePageRank(ICallGraph<NodeType> callGraph) {
 
         // Collect all methods (nodes) in the call graph.
-        Set<MethodSignature> nodes = callGraph.getMethodSignatures();
+        Set<NodeType> nodes = callGraph.getNodes();
         int n = nodes.size();
 
         // Initialize uniform probability distribution.
-        Map<MethodSignature, Double> scores = new HashMap<>();
-        for (MethodSignature node : nodes) {
+        Map<NodeType, Double> scores = new HashMap<>();
+        for (NodeType node : nodes) {
             scores.put(node, 1.0 / n);
         }
 
         // Perform power-iteration until stable or max iterations reached.
         for (int iter = 0; iter < MAX_ITERATIONS; iter++) {
 
-            Map<MethodSignature, Double> newScores = new HashMap<>();
+            Map<NodeType, Double> newScores = new HashMap<>();
             double danglingScore = 0.0;
 
             // A "dangling node" has no outgoing calls.
             // Its rank is distributed evenly across the entire graph.
-            for (MethodSignature node : nodes) {
+            for (NodeType node : nodes) {
                 if (callGraph.callsFrom(node).isEmpty()) {
                     danglingScore += scores.get(node);
                 }
@@ -74,13 +59,13 @@ public class PageRank {
             boolean converged = true;
 
             // Update rank scores based on incoming edges.
-            for (MethodSignature node : nodes) {
+            for (NodeType node : nodes) {
 
                 // Sum contributions from all callers of this node.
                 double incomingSum = 0.0;
-                for (CallGraph.Call incomingEdge : callGraph.callsTo(node)) {
+                for (ICallGraph.Edge<NodeType> incomingEdge : callGraph.callsTo(node)) {
 
-                    MethodSignature sourceNode = incomingEdge.sourceMethodSignature();
+                    NodeType sourceNode = incomingEdge.getSource();
                     int outDegree = callGraph.callsFrom(sourceNode).size();
 
                     // Each caller divides its rank among the methods it calls.
@@ -112,9 +97,6 @@ public class PageRank {
             }
         }
 
-        pageRankScores.clear();
-        pageRankScores.putAll(scores);
-
-        return pageRankScores;
+        return scores;
     }
 }

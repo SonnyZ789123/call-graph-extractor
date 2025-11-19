@@ -84,7 +84,8 @@ public class MainCallGraphGenerator {
 
         // Compute PageRank
         PageRank pageRank = new PageRank();
-        Map<MethodSignature, Double> pageRankScores = pageRank.computePageRank(cg);
+        SootUpCallGraphWrapper cgWrapper = new SootUpCallGraphWrapper(cg);
+        Map<MethodSignature, Double> pageRankScores = pageRank.computePageRank(cgWrapper);
         Map<String, Double> stringKeyedScores = pageRankScores.entrySet().stream()
                 .collect(Collectors.toMap(
                         e -> e.getKey().toString(),
