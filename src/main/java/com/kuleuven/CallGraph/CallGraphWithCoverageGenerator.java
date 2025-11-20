@@ -15,33 +15,31 @@ public class CallGraphWithCoverageGenerator {
         /*
          * Expected arguments:
          *   0: classPath              (e.g., "./target/classes")
-         *   1: fully-qualified class  (e.g., "com.kuleuven.library.Main")
-         *   2: entry method signature (e.g., "void main(java.lang.String[])")
-         *   3: path to test classes   (e.g., "./target/test-classes")
+         *   1: path to test classes   (e.g., "./target/test-classes")
+         *   2: fully-qualified method signature (e.g., "<com.kuleuven.library.Main: void main(java.lang.String[])>")
          *   3: algorithm choice       ("cha" or "rta")
          *   4: project prefixes       (optional, comma-separated, e.g., "com.kuleuven,org.example")
          */
         if (args.length < 4) {
-            System.out.println("Usage: java -cp <jar> com.kuleuven.CallGraph.MainCallGraphGenerator <classPath> <mainClass> \"<entryMethodSignature>\" <pathToTestClasses> <cha|rta> <projectPrefixes>");
-            System.out.println("Example: java -cp target/myjar.jar com.kuleuven.CallGraph.MainCallGraphGenerator ./target/classes com.kuleuven.library.Main \"void main(java.lang.String[])\" ./target/test-classes cha com.kuleuven,org.example");
+            System.out.println("Usage: java -cp <jar> com.kuleuven.CallGraph.MainCallGraphGenerator <classPath> <pathToTestClasses> <fullyQualifiedMethodSignature> <cha|rta> [projectPrefixes]");
+            System.out.println("Example: java -cp target/myjar.jar com.kuleuven.CallGraph.MainCallGraphGenerator ./target/classes ./target/test-classes \"<com.kuleuven.library.Main: void main(java.lang.String[])>\" cha com.kuleuven,org.example");
             System.exit(1);
         }
 
         String classPath = args[0];
-        String mainClassName = args[1];
-        String entryMethodSignature = args[2];
-        String pathToTestClasses = args[3];
-        String algorithmChoice = args[4].toLowerCase();
+        String pathToTestClasses = args[1];
+        String fullyQualifiedMethodSignature = args[2];
+        String algorithmChoice = args[3].toLowerCase();
         List<String> projectPrefixes = new ArrayList<>();
-        if (args.length >= 6) {
-            String[] prefixes = args[5].split(",");
+        if (args.length >= 5) {
+            String[] prefixes = args[4].split(",");
             for (String prefix : prefixes) {
                 projectPrefixes.add(prefix.trim());
             }
         }
 
         try {
-            CallGraph cg = MainCallGraphGenerator.buildCallGraph(classPath, mainClassName, entryMethodSignature, algorithmChoice);
+            CallGraph cg = MainCallGraphGenerator.buildCallGraph(classPath, fullyQualifiedMethodSignature, algorithmChoice);
             MainCallGraphGenerator.writeOutputs(cg, projectPrefixes);
 
             CallGraph testCg = TestCallGraphGenerator.buildTestCallGraph(classPath, pathToTestClasses, algorithmChoice);

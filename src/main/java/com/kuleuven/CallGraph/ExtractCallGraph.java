@@ -20,61 +20,18 @@ import java.util.stream.Stream;
 
 
 public class ExtractCallGraph {
-    public CallGraph extract(String classPath, String mainClassName, String entryMethodSignature, CallGraphConstructionAlgorithm algorithmChoice) {
-        /*
-         * Parse "void main(java.lang.String[])" into:
-         *   returnType = "void"
-         *   methodName = "main"
-         *   parameters = ["java.lang.String[]"]
-         */
-        String returnType = entryMethodSignature.substring(0, entryMethodSignature.indexOf(' ')).trim();
-        String afterReturn = entryMethodSignature.substring(entryMethodSignature.indexOf(' ') + 1).trim();
-        String methodName = afterReturn.substring(0, afterReturn.indexOf('(')).trim();
-        String paramList = afterReturn.substring(afterReturn.indexOf('(') + 1, afterReturn.indexOf(')')).trim();
-
-        List<String> parameters;
-        if (paramList.isEmpty()) {
-            parameters = Collections.emptyList();
-        } else {
-            parameters = Arrays.stream(paramList.split(","))
-                    .map(String::trim)
-                    .collect(Collectors.toList());
-        }
-
+    public CallGraph extract(String classPath, String fullyQualifiedMethodSignature, CallGraphConstructionAlgorithm algorithmChoice) {
         // Load classes from the given classpath
         AnalysisInputLocation inputLocation = new JavaClassPathAnalysisInputLocation(classPath);
         JavaView view = new JavaView(inputLocation);
 
-        // Resolve the class we start from
-        JavaClassType classType = view.getIdentifierFactory().getClassType(mainClassName);
-        Optional<JavaSootClass> maybeClass = view.getClass(classType);
-
-        if (maybeClass.isEmpty()) {
-            System.err.println("❌ Could not load class " + mainClassName);
-            System.exit(1);
-        }
-
-        JavaSootClass sootClass = maybeClass.get();
-
         /*
          * Create the exact method signature in SootUp form.
          * If this does not match exactly, SootUp cannot find the method.
+         * The fully qualified method signature is expected to be in the format:
+         * <packageName.classType: void main(java.lang.String[])>
          */
-        MethodSignature methodSignature = view.getIdentifierFactory().getMethodSignature(
-                classType,
-                methodName,
-                returnType,
-                parameters
-        );
-
-        // Check if the method actually exists in the class
-        MethodSubSignature mss = methodSignature.getSubSignature();
-        Optional<JavaSootMethod> opt = sootClass.getMethod(mss);
-
-        if (opt.isEmpty()) {
-            System.err.println("❌ Method not found: " + entryMethodSignature);
-            System.exit(1);
-        }
+        MethodSignature methodSignature = view.getIdentifierFactory().parseMethodSignature(fullyQualifiedMethodSignature);
 
         // Select call graph analysis algorithm
         CallGraphAlgorithm cgAlgorithm = switch (algorithmChoice) {

@@ -5,6 +5,6 @@
 set -e
 
 mvn -q -DskipTests=true package
-mvn exec:java -Dexec.mainClass="com.kuleuven.CallGraph.MainCallGraphGenerator" -Dexec.args="/Users/yoran/dev/library-application/target/classes com.kuleuven.library.Main \"void main(java.lang.String[])\" cha com.kuleuven"
+mvn exec:java -Dexec.mainClass="com.kuleuven.CallGraph.MainCallGraphGenerator" -Dexec.args="/Users/yoran/dev/library-application/target/classes \"<com.kuleuven.library.Main: void main(java.lang.String[])>\" cha com.kuleuven"
 
 echo "✅ Done!"

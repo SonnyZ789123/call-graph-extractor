@@ -11,7 +11,6 @@ import sootup.core.signatures.MethodSignature;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -22,31 +21,29 @@ public class MainCallGraphGenerator {
         /*
          * Expected arguments:
          *   0: classPath              (e.g., "./target/classes")
-         *   1: fully-qualified class  (e.g., "com.kuleuven.library.Main")
-         *   2: entry method signature (e.g., "void main(java.lang.String[])")
-         *   3: algorithm choice       ("cha" or "rta")
-         *   4: project prefixes       (optional, comma-separated, e.g., "com.kuleuven,org.example")
+         *   1: fully-qualified method signature (e.g., "<com.kuleuven.library.Main: void main(java.lang.String[])>")
+         *   2: algorithm choice       ("cha" or "rta")
+         *   3: project prefixes       (optional, comma-separated, e.g., "com.kuleuven,org.example")
          */
-        if (args.length < 4) {
-            System.out.println("Usage: java -cp <jar> com.kuleuven.CallGraph.MainCallGraphGenerator <classPath> <mainClass> \"<entryMethodSignature>\" <cha|rta> <projectPrefixes>");
-            System.out.println("Example: java -cp target/myjar.jar com.kuleuven.CallGraph.MainCallGraphGenerator ./target/classes com.kuleuven.library.Main \"void main(java.lang.String[])\" cha com.kuleuven,org.example");
+        if (args.length < 3) {
+            System.out.println("Usage: java -cp <jar> com.kuleuven.CallGraph.MainCallGraphGenerator <fullyQualifiedMethodSignature> \"<entryMethodSignature>\" <cha|rta> [projectPrefixes]");
+            System.out.println("Example: java -cp target/myjar.jar com.kuleuven.CallGraph.MainCallGraphGenerator ./target/classes \"<com.kuleuven.library.Main: void main(java.lang.String[])>\" cha com.kuleuven,org.example");
             System.exit(1);
         }
 
         String classPath = args[0];
-        String mainClassName = args[1];
-        String entryMethodSignature = args[2];
-        String algorithmChoice = args[3].toLowerCase();
+        String fullyQualifiedMethodSignature = args[1];
+        String algorithmChoice = args[2].toLowerCase();
         List<String> projectPrefixes = new ArrayList<>();
-        if (args.length >= 5) {
-            String[] prefixes = args[4].split(",");
+        if (args.length >= 4) {
+            String[] prefixes = args[3].split(",");
             for (String prefix : prefixes) {
                 projectPrefixes.add(prefix.trim());
             }
         }
 
         try {
-            CallGraph cg = buildCallGraph(classPath, mainClassName, entryMethodSignature, algorithmChoice);
+            CallGraph cg = buildCallGraph(classPath, fullyQualifiedMethodSignature, algorithmChoice);
             writeOutputs(cg, projectPrefixes);
         } catch (IOException e) {
             System.err.println("❌ Call graph generation failed: " + e.getMessage());
@@ -58,20 +55,18 @@ public class MainCallGraphGenerator {
      * Builds a call graph from the given parameters.
      *
      * @param classPath The classpath to analyze (compiled .class files or jars)
-     * @param mainClassName Fully-qualified class name containing the entry method
-     * @param entryMethodSignature Signature of the entry method (e.g. "void main(java.lang.String[])")
+     * @param fullyQualifiedMethodSignature Fully-qualified method signature (e.g., "<com.kuleuven.library.Main: void main(java.lang.String[])>")
      * @param algorithmChoice Call graph construction algorithm ("cha", "rta", etc.)
      * @return The constructed CallGraph
      * @throws IOException If extraction fails
      */
     public static CallGraph buildCallGraph(String classPath,
-                                           String mainClassName,
-                                           String entryMethodSignature,
+                                           String fullyQualifiedMethodSignature,
                                            String algorithmChoice) throws IOException {
         ExtractCallGraph extractor = new ExtractCallGraph();
         CallGraphConstructionAlgorithm cgAlgorithm = CallGraphConstructionAlgorithm.fromString(algorithmChoice);
 
-        return extractor.extract(classPath, mainClassName, entryMethodSignature, cgAlgorithm);
+        return extractor.extract(classPath, fullyQualifiedMethodSignature, cgAlgorithm);
     }
 
     /**
