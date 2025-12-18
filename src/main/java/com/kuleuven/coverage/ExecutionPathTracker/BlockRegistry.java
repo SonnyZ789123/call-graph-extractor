@@ -5,6 +5,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.Map;
 
 public final class BlockRegistry {
@@ -32,6 +33,22 @@ public final class BlockRegistry {
             throw new RuntimeException(e);
         }
     }
+
+    public static Map<String, Integer> buildLookup() {
+        Map<String, Integer> map = new HashMap<>();
+
+        for (Map.Entry<Integer, BlockInfo> e : BLOCKS.entrySet()) {
+            BlockInfo info = e.getValue();
+            String key = info.className() + "|" +
+                         info.methodDescriptor() + "|" +
+                         info.bytecodeOffset();
+
+            map.put(key, e.getKey());
+        }
+
+        return map;
+    }
+
 
     public static Map<Integer, BlockInfo> getBlocks() {
         return BLOCKS;
