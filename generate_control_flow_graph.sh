@@ -5,6 +5,6 @@
 set -e
 
 mvn -q -DskipTests=true package
-mvn exec:java -Dexec.mainClass="com.kuleuven.ControlFlowGraph.MainControlFlowGraphGenerator" -Dexec.args="/Users/yoran/dev/library-application/target/classes \"<com.kuleuven.library.domain.Book: double getReducedPrice()>\""
+mvn exec:java -Dexec.mainClass="com.kuleuven.ControlFlowGraph.MainControlFlowGraphGenerator" -Dexec.args="/Users/yoran/dev/master-thesis/call-graph-generator/target/classes/ \"<com.kuleuven._examples.Foo: int foo(int)>\""
 
 echo "✅ Done!"
