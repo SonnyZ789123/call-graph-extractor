@@ -1,5 +1,10 @@
 package com.kuleuven._examples;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.BitSet;
+
 public class Foo {
     public static int foo(int x) {
         System.out.println("\n-------- In foo! Parameter = " + x);
@@ -63,6 +68,23 @@ public class Foo {
     }
 
     public static void main(String[] args) {
-        foo(5);
+        /*
+        java \                                                                                                                                1 ↵
+          -javaagent:../coverage-agent/target/coverage-agent-1.0.jar=projectPrefix=com/kuleuven/_examples,outputPath=out/coverage.out \
+          -cp target/classes \
+          com.kuleuven._examples.Foo
+         */
+
+        foo(50);
+
+        try (ObjectInputStream ois =
+                     new ObjectInputStream(new FileInputStream("out/coverage.out"))) {
+
+            BitSet coveredBlocks = (BitSet) ois.readObject();
+
+            System.out.println("Covered blocks: " + coveredBlocks);
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
