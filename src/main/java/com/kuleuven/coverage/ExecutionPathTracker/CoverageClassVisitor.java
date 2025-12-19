@@ -14,7 +14,6 @@ class CoverageClassVisitor extends ClassVisitor {
     @Override
     public void visit(int v, int a, String name, String sig, String sup, String[] ifs) {
         this.className = name.replace('/', '.');
-        System.out.printf("Instrumenting class: %s%n", this.className);
         super.visit(v, a, name, sig, sup, ifs);
     }
 

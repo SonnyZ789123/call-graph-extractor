@@ -6,6 +6,7 @@ public final class CoverageRuntime {
     private static final BitSet blocks = new BitSet();
 
     public static void hit(int blockId) {
+        System.out.println("hit: " + blockId);
         blocks.set(blockId);
     }
 

@@ -10,16 +10,21 @@ import java.util.Map;
 
 public final class BlockRegistry {
     private static final String CFG_BLOCK_MAPPING_FILE_PATH = "./out/cfg_block_mapping.json";
+
     private static Map<Integer, BlockInfo> BLOCKS;
+
+    private static final Map<String, Integer> LINE_LOOKUP = new HashMap<>();
 
     static {
         load();
+        buildLineLookup();
     }
 
     private static void load() {
         try {
             Gson gson = new Gson();
-            Type type = new TypeToken<Map<Integer, BlockInfo>>() {}.getType();
+            Type type = new TypeToken<Map<Integer, BlockInfo>>() {
+            }.getType();
 
             try (InputStreamReader reader =
                          new InputStreamReader(
@@ -34,21 +39,40 @@ public final class BlockRegistry {
         }
     }
 
-    public static Map<String, Integer> buildLookup() {
-        Map<String, Integer> map = new HashMap<>();
-
+    private static void buildLineLookup() {
         for (Map.Entry<Integer, BlockInfo> e : BLOCKS.entrySet()) {
             BlockInfo info = e.getValue();
-            String key = info.className() + "|" +
-                         info.methodDescriptor() + "|" +
-                         info.bytecodeOffset();
+            String key = createKey(
+                    info.className(),
+                    info.methodName(),
+                    info.methodDescriptor(),
+                    info.lineNumber());
 
-            map.put(key, e.getKey());
+            LINE_LOOKUP.put(key, e.getKey());
         }
-
-        return map;
     }
 
+    public static String createKey(
+            String className,
+            String methodName,
+            String methodDescriptor,
+            int lineNumber
+    ) {
+        return className + "|" +
+                methodName + "|" +
+                methodDescriptor + "|" +
+                lineNumber;
+    }
+
+    public static Integer lookupByLine(
+            String className,
+            String methodName,
+            String methodDescriptor,
+            int lineNumber
+    ) {
+        String key = createKey(className, methodName, methodDescriptor, lineNumber);
+        return LINE_LOOKUP.get(key);
+    }
 
     public static Map<Integer, BlockInfo> getBlocks() {
         return BLOCKS;

@@ -57,8 +57,6 @@ public class CoverageAgent {
             return false;
         }
 
-        System.out.println("Instrumenting: " + internalClassName);
-
         return internalClassName.startsWith("com/kuleuven/_examples/");
     }
 }

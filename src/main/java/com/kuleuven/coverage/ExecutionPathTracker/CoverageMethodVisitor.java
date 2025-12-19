@@ -11,7 +11,6 @@ class CoverageMethodVisitor extends MethodVisitor {
     private final String className;
     private final String methodName;
     private final String desc;
-    private int currentOffset = 0;
 
     CoverageMethodVisitor(MethodVisitor mv, String cls, String m, String d) {
         super(Opcodes.ASM9, mv);
@@ -22,13 +21,6 @@ class CoverageMethodVisitor extends MethodVisitor {
 
     @Override
     public void visitLabel(Label label) {
-        System.out.println("================ visitLabel ================");
-        System.out.printf("start: %s\n", label.toString());
-
-//        Integer blockId = lookupBlockId(className, methodName, desc, currentOffset);
-//        if (blockId != null) {
-//            injectHit(blockId);
-//        }
         super.visitLabel(label);
     }
 
@@ -36,7 +28,7 @@ class CoverageMethodVisitor extends MethodVisitor {
             String className,
             String methodName,
             String methodDesc,
-            int bytecodeOffset
+            int lineNumber
     ) {
         String asmMethodDescriptor = methodName + methodDesc;
 
@@ -51,7 +43,7 @@ class CoverageMethodVisitor extends MethodVisitor {
                 continue;
             }
 
-            if (info.bytecodeOffset() == bytecodeOffset) {
+            if (info.lineNumber() == lineNumber) {
                 return e.getKey();
             }
         }
@@ -64,7 +56,7 @@ class CoverageMethodVisitor extends MethodVisitor {
         mv.visitLdcInsn(blockId);
         mv.visitMethodInsn(
                 Opcodes.INVOKESTATIC,
-                "coverage/CoverageRuntime",
+                "com/kuleuven/coverage/ExecutionPathTracker/CoverageRuntime",
                 "hit",
                 "(I)V",
                 false
@@ -73,15 +65,19 @@ class CoverageMethodVisitor extends MethodVisitor {
 
     @Override
     public void visitLineNumber(int line, Label start) {
-//        Integer blockId = lookupBlockIdByLine(className, methodName, desc, line);
-        System.out.println("================ visitLineNumber ================");
-        System.out.printf("line: %s\n", line);
-        System.out.printf("start: %s\n", start.toString());
-        Integer blockId = null;
+        Integer blockId = BlockRegistry.lookupByLine(
+                className,
+                methodName,
+                desc,
+                line
+        );
+
         if (blockId != null) {
             injectHit(blockId);
         }
+
         super.visitLineNumber(line, start);
     }
+
 }
 
