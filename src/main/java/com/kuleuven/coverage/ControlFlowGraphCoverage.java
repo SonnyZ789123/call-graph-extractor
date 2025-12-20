@@ -4,7 +4,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.kuleuven.ControlFlowGraph.ExtractControlFlowGraph;
 import com.kuleuven.coverage.CoverageAgent.BlockInfo;
+import com.kuleuven.coverage.CoverageAgent.JvmDescriptorUtil;
 import sootup.core.graph.BasicBlock;
+import sootup.core.types.*;
 import sootup.core.graph.MutableBlockStmtGraph;
 import sootup.core.jimple.common.stmt.Stmt;
 
@@ -15,12 +17,30 @@ import java.util.Map;
 
 public class ControlFlowGraphCoverage {
     public static void main(String[] args) {
-        ExtractControlFlowGraph extractor = new ExtractControlFlowGraph();
+        /*
+         * Expected arguments:
+         *   0: classPath              (e.g., "./target/classes")
+         *   1: fully-qualified method signature (e.g., "<com.kuleuven._examples.Foo: int foo(int)>")
+         */
+        if (args.length < 2) {
+            System.out.println("Usage: java -cp <jar> com.kuleuven.coverage.ControlFlowGraphCoverage <classPath> <fullyQualifiedMethodSignature>");
+            System.out.println("Example: java -cp target/myjar.jar com.kuleuven.coverage.ControlFlowGraphCoverage ./target/classes \"<com.kuleuven._examples.Foo: int foo(int)>\"");
+            System.exit(1);
+        }
 
-        MutableBlockStmtGraph cfg = (MutableBlockStmtGraph) extractor.extract(
-                "./target/classes",
-                "<com.kuleuven._examples.Foo: int foo(int)>"
+        String classPath = args[0];
+        String fullyQualifiedMethodSignature = args[1];
+
+        writeCfgBlockMap(classPath, fullyQualifiedMethodSignature);
+    }
+
+    public static void writeCfgBlockMap(String classPath, String fullyQualifiedMethodSignature) {
+        ExtractControlFlowGraph extractor = new ExtractControlFlowGraph(
+                classPath,
+                fullyQualifiedMethodSignature
         );
+
+        MutableBlockStmtGraph cfg = (MutableBlockStmtGraph) extractor.extract();
 
         Map<Integer, BlockInfo> blocksById = new LinkedHashMap<>();
 
@@ -31,9 +51,9 @@ public class ControlFlowGraphCoverage {
             int lineNumber = entry.getPositionInfo().getStmtPosition().getFirstLine();
 
             BlockInfo info = new BlockInfo(
-                    "com.kuleuven._examples.Foo",
-                    "foo",
-                    "(I)I",
+                    extractor.method.getDeclaringClassType().getFullyQualifiedName(),
+                    extractor.method.getName(),
+                    JvmDescriptorUtil.toJvmMethodDescriptor(extractor.method),
                     entry.toString(),
                     lineNumber
             );
