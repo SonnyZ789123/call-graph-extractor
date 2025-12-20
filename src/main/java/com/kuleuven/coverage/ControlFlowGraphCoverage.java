@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.kuleuven.ControlFlowGraph.ExtractControlFlowGraph;
 import com.kuleuven.coverage.CoverageAgent.BlockInfo;
 import com.kuleuven.coverage.CoverageAgent.JvmDescriptorUtil;
+import com.kuleuven.coverage.CoverageAgent.SootStmtGraphUtil;
 import sootup.core.graph.BasicBlock;
 import sootup.core.types.*;
 import sootup.core.graph.MutableBlockStmtGraph;
@@ -54,7 +55,7 @@ public class ControlFlowGraphCoverage {
                     extractor.method.getDeclaringClassType().getFullyQualifiedName(),
                     extractor.method.getName(),
                     JvmDescriptorUtil.toJvmMethodDescriptor(extractor.method),
-                    entry.toString(),
+                    SootStmtGraphUtil.getStmtId(entry),
                     lineNumber
             );
 
