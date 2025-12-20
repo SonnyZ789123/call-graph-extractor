@@ -1,4 +1,4 @@
-package com.kuleuven.coverage.ExecutionPathTracker;
+package com.kuleuven.coverage.CoverageAgent;
 
 // Should match the representation that is used in ASM instrumentation
 public record BlockInfo(

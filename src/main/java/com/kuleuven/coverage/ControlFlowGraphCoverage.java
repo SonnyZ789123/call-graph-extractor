@@ -3,7 +3,7 @@ package com.kuleuven.coverage;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.kuleuven.ControlFlowGraph.ExtractControlFlowGraph;
-import com.kuleuven.coverage.ExecutionPathTracker.BlockInfo;
+import com.kuleuven.coverage.CoverageAgent.BlockInfo;
 import sootup.core.graph.BasicBlock;
 import sootup.core.graph.MutableBlockStmtGraph;
 import sootup.core.jimple.common.stmt.Stmt;

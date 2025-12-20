@@ -70,7 +70,7 @@ public class Foo {
     public static void main(String[] args) {
         /*
         java \                                                                                                                                1 ↵
-          -javaagent:../coverage-agent/target/coverage-agent-1.0.jar=projectPrefix=com/kuleuven/_examples,outputPath=out/coverage.out \
+          -javaagent:../coverage-agent/target/coverage-agent-1.0.jar=projectPrefix=com/kuleuven/_examples,outputPath=out/coverage.out,blockMapPath=out/cfg_block_mapping.json \
           -cp target/classes \
           com.kuleuven._examples.Foo
          */
