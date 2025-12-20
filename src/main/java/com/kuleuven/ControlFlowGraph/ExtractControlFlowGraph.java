@@ -1,6 +1,5 @@
 package com.kuleuven.ControlFlowGraph;
 
-import sootup.core.graph.ImmutableBlockStmtGraph;
 import sootup.core.graph.MutableBlockStmtGraph;
 import sootup.core.graph.StmtGraph;
 import sootup.core.inputlocation.AnalysisInputLocation;
@@ -13,10 +12,13 @@ import java.util.Optional;
 
 
 public class ExtractControlFlowGraph {
-    public StmtGraph<?> extract(String classPath, String fullyQualifiedMethodSignature) {
+    public JavaView view;
+    public JavaSootMethod method;
+
+    public ExtractControlFlowGraph(String classPath, String fullyQualifiedMethodSignature) {
         // Load classes from the given classpath
         AnalysisInputLocation inputLocation = new JavaClassPathAnalysisInputLocation(classPath);
-        JavaView view = new JavaView(inputLocation);
+        this.view = new JavaView(inputLocation);
 
         /*
          * Create the exact method signature in SootUp form.
@@ -32,8 +34,10 @@ public class ExtractControlFlowGraph {
             System.exit(1);
         }
 
-        JavaSootMethod method = opt.get();
+        this.method = opt.get();
+    }
 
+    public StmtGraph<?> extract() {
         return new MutableBlockStmtGraph(method.getBody().getStmtGraph());
     }
 }

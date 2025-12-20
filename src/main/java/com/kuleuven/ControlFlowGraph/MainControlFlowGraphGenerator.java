@@ -40,9 +40,9 @@ public class MainControlFlowGraphGenerator {
      * @throws IOException If extraction fails
      */
     public static StmtGraph<?> buildControlFlowGraph(String classPath, String fullyQualifiedMethodSignature) throws IOException {
-        ExtractControlFlowGraph extractor = new ExtractControlFlowGraph();
+        ExtractControlFlowGraph extractor = new ExtractControlFlowGraph(classPath, fullyQualifiedMethodSignature);
 
-        return extractor.extract(classPath, fullyQualifiedMethodSignature);
+        return extractor.extract();
     }
 
     /**
