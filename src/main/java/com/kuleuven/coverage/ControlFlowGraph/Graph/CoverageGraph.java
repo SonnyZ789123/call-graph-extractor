@@ -46,7 +46,7 @@ public class CoverageGraph extends MutableBlockStmtGraph {
      * @param stmtGraph the StmtGraph
      * @return the coverage graph
      */
-    public PropertyGraph createGraph(StmtGraph<?> stmtGraph) {
+    private PropertyGraph createGraph(StmtGraph<?> stmtGraph) {
         PropertyGraph.Builder graphBuilder = new CFGCoverageGraph.Builder();
         graphBuilder.setName("cfg_coverage");
 
