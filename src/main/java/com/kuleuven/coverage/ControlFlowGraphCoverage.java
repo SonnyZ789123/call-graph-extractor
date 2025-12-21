@@ -52,6 +52,7 @@ public class ControlFlowGraphCoverage {
             int lineNumber = entry.getPositionInfo().getStmtPosition().getFirstLine();
 
             BlockInfo info = new BlockInfo(
+                    nextId,
                     extractor.method.getDeclaringClassType().getFullyQualifiedName(),
                     extractor.method.getName(),
                     JvmDescriptorUtil.toJvmMethodDescriptor(extractor.method),

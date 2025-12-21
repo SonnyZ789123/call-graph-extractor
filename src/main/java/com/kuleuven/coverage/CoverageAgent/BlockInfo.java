@@ -1,6 +1,7 @@
 package com.kuleuven.coverage.CoverageAgent;
 
 public record BlockInfo(
+        int blockId,
         String className,
         String methodName,
         String methodDescriptor,
