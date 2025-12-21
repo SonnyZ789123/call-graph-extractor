@@ -51,11 +51,22 @@ public class CoverageGraphToDotConverter {
     }
 
     private static String getNodeLabel(CoverageNode node) {
-        return escapeDot(node.toString());
+        String stmt = escapeDot(node.getBlock().getHead().toString());
+        int hits = node.getCoverageCount();
+
+        return String.format("{%s|hits=%d}", stmt, hits);
     }
 
     private static String getNodeColor(CoverageNode node) {
-        return "lightblue";
+        int hits = node.getCoverageCount();
+
+        if (hits == 0) {
+            return "indianred1";
+        } else if (hits <= 2) {
+            return "khaki1";
+        } else {
+            return "palegreen3";
+        }
     }
 
     private static String getEdgeColor(PropertyGraphEdge edge) {
