@@ -1,7 +1,7 @@
 package com.kuleuven.coverage.ControlFlowGraph.Graph;
 
 import sootup.codepropertygraph.propertygraph.edges.*;
-import sootup.codepropertygraph.propertygraph.nodes.StmtGraphNode;
+import sootup.codepropertygraph.propertygraph.nodes.ControlFlowGraphNode;
 import sootup.core.jimple.common.stmt.JGotoStmt;
 import sootup.core.jimple.common.stmt.JIfStmt;
 import sootup.core.jimple.common.stmt.Stmt;
@@ -32,8 +32,8 @@ public class CoverageEdge extends PropertyGraphEdge {
     public static CoverageEdge exceptionalEdge(
             CoverageNode sourceNode,
             CoverageNode destinationNode) {
-        StmtGraphNode source = new StmtGraphNode(sourceNode.getBlock().getTail());
-        StmtGraphNode destination = new StmtGraphNode(destinationNode.getBlock().getHead());
+        ControlFlowGraphNode source = new ControlFlowGraphNode(sourceNode.getBlock().getTail());
+        ControlFlowGraphNode destination = new ControlFlowGraphNode(destinationNode.getBlock().getHead());
 
         AbstCfgEdge internalEdge = new ExceptionalCfgEdge(source, destination);
 
@@ -45,8 +45,8 @@ public class CoverageEdge extends PropertyGraphEdge {
             int successorIndex,
             CoverageNode sourceNode,
             CoverageNode destinationNode) {
-        StmtGraphNode source = new StmtGraphNode(sourceNode.getBlock().getTail());
-        StmtGraphNode destination = new StmtGraphNode(destinationNode.getBlock().getHead());
+        ControlFlowGraphNode source = new ControlFlowGraphNode(sourceNode.getBlock().getTail());
+        ControlFlowGraphNode destination = new ControlFlowGraphNode(destinationNode.getBlock().getHead());
 
         AbstCfgEdge internalEdge = createEdge(
                 currStmt,
@@ -68,7 +68,7 @@ public class CoverageEdge extends PropertyGraphEdge {
      * @return the created edge
      */
     private static AbstCfgEdge createEdge(
-            Stmt currStmt, int successorIndex, StmtGraphNode sourceNode, StmtGraphNode destinationNode) {
+            Stmt currStmt, int successorIndex, ControlFlowGraphNode sourceNode, ControlFlowGraphNode destinationNode) {
         if (currStmt instanceof JIfStmt) {
             return successorIndex == JIfStmt.TRUE_BRANCH_IDX
                     ? new IfTrueCfgEdge(sourceNode, destinationNode)

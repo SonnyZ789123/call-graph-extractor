@@ -1,24 +1,23 @@
 package com.kuleuven.coverage.ControlFlowGraph.Graph;
 
 import com.kuleuven.coverage.CoverageAgent.BlockInfo;
-import com.kuleuven.coverage.CoverageAgent.SootStmtGraphUtil;
+import com.kuleuven.coverage.CoverageAgent.SootControlFlowGraphUtil;
 import sootup.codepropertygraph.propertygraph.PropertyGraph;
-import sootup.codepropertygraph.propertygraph.edges.*;
-import sootup.core.graph.MutableBlockStmtGraph;
-import sootup.core.graph.StmtGraph;
+import sootup.core.graph.MutableBlockControlFlowGraph;
+import sootup.core.graph.ControlFlowGraph;
 import sootup.core.jimple.common.stmt.Stmt;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class CoverageGraph extends MutableBlockStmtGraph {
-    private final StmtGraph<?> cfg;
+public class CoverageGraph extends MutableBlockControlFlowGraph {
+    private final ControlFlowGraph<?> cfg;
     private final Map<Integer, Integer> blockIdToCoverageCount;
     private final Map<Integer, BlockInfo> blocksById;
     private final PropertyGraph graph;
 
     public CoverageGraph(
-            StmtGraph<?> cfg,
+            ControlFlowGraph<?> cfg,
             Map<Integer, BlockInfo> blocksById,
             Map<Integer, Integer> blockIdToCoverageCount) {
         this.cfg = cfg;
@@ -32,7 +31,7 @@ public class CoverageGraph extends MutableBlockStmtGraph {
     }
 
     private BlockInfo findBlockInfoByStmt(Stmt stmt) {
-        String stmtId = SootStmtGraphUtil.getStmtId(stmt);
+        String stmtId = SootControlFlowGraphUtil.getStmtId(stmt);
 
         return blocksById.values().stream()
                 .filter(blockInfo -> blockInfo.stmtId().equals(stmtId))
@@ -43,17 +42,17 @@ public class CoverageGraph extends MutableBlockStmtGraph {
      * Reference: See CfgCreator class of SootUp 2.0.
      * Creates the coverage graph for the given Soot method.
      *
-     * @param stmtGraph the StmtGraph
+     * @param cfg the ControlFlowGraph
      * @return the coverage graph
      */
-    private PropertyGraph createGraph(StmtGraph<?> stmtGraph) {
+    private PropertyGraph createGraph(ControlFlowGraph<?> cfg) {
         PropertyGraph.Builder graphBuilder = new CFGCoverageGraph.Builder();
         graphBuilder.setName("cfg_coverage");
 
         // (blockId, CoverageNode)
         Map<Integer, CoverageNode> seenBlocks = new HashMap<>();
 
-        stmtGraph.getBlocks().forEach(
+        cfg.getBlocks().forEach(
             currBlock -> {
                 Stmt entryStmt = currBlock.getHead();
                 Stmt tailStmt = currBlock.getTail();
@@ -75,7 +74,7 @@ public class CoverageGraph extends MutableBlockStmtGraph {
                 int expectedCount = tailStmt.getExpectedSuccessorCount();
                 int successorIndex = 0;
 
-                for (Stmt successor : stmtGraph.getAllSuccessors(tailStmt)) {
+                for (Stmt successor : cfg.getAllSuccessors(tailStmt)) {
                     BlockInfo successorBlockInfo = findBlockInfoByStmt(successor);
                     if (successorBlockInfo == null) {
                         continue;

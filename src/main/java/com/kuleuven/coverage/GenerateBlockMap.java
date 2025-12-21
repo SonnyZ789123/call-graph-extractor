@@ -5,9 +5,9 @@ import com.google.gson.GsonBuilder;
 import com.kuleuven.ControlFlowGraph.ExtractControlFlowGraph;
 import com.kuleuven.coverage.CoverageAgent.BlockInfo;
 import com.kuleuven.coverage.CoverageAgent.JvmDescriptorUtil;
-import com.kuleuven.coverage.CoverageAgent.SootStmtGraphUtil;
+import com.kuleuven.coverage.CoverageAgent.SootControlFlowGraphUtil;
 import sootup.core.graph.BasicBlock;
-import sootup.core.graph.MutableBlockStmtGraph;
+import sootup.core.graph.MutableBlockControlFlowGraph;
 import sootup.core.jimple.common.stmt.Stmt;
 
 import java.io.FileWriter;
@@ -41,7 +41,7 @@ public class GenerateBlockMap {
                 fullyQualifiedMethodSignature
         );
 
-        MutableBlockStmtGraph cfg = (MutableBlockStmtGraph) extractor.extract();
+        MutableBlockControlFlowGraph cfg = (MutableBlockControlFlowGraph) extractor.extract();
 
         Map<Integer, BlockInfo> blocksById = new LinkedHashMap<>();
 
@@ -56,7 +56,7 @@ public class GenerateBlockMap {
                     extractor.method.getDeclaringClassType().getFullyQualifiedName(),
                     extractor.method.getName(),
                     JvmDescriptorUtil.toJvmMethodDescriptor(extractor.method),
-                    SootStmtGraphUtil.getStmtId(entry),
+                    SootControlFlowGraphUtil.getStmtId(entry),
                     lineNumber
             );
 

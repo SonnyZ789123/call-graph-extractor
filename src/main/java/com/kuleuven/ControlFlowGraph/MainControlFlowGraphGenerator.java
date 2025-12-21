@@ -1,6 +1,6 @@
 package com.kuleuven.ControlFlowGraph;
 
-import sootup.core.graph.StmtGraph;
+import sootup.core.graph.ControlFlowGraph;
 import sootup.core.util.DotExporter;
 
 import java.io.FileWriter;
@@ -23,7 +23,7 @@ public class MainControlFlowGraphGenerator {
         String fullyQualifiedMethodSignature = args[1];
 
         try {
-            StmtGraph<?> cfg = buildControlFlowGraph(classPath, fullyQualifiedMethodSignature);
+            ControlFlowGraph<?> cfg = buildControlFlowGraph(classPath, fullyQualifiedMethodSignature);
             writeOutputs(cfg);
         } catch (IOException e) {
             System.err.println("❌ Control flow graph generation failed: " + e.getMessage());
@@ -39,7 +39,7 @@ public class MainControlFlowGraphGenerator {
      * @return The constructed control flow graph
      * @throws IOException If extraction fails
      */
-    public static StmtGraph<?> buildControlFlowGraph(String classPath, String fullyQualifiedMethodSignature) throws IOException {
+    public static ControlFlowGraph<?> buildControlFlowGraph(String classPath, String fullyQualifiedMethodSignature) throws IOException {
         ExtractControlFlowGraph extractor = new ExtractControlFlowGraph(classPath, fullyQualifiedMethodSignature);
 
         return extractor.extract();
@@ -51,7 +51,7 @@ public class MainControlFlowGraphGenerator {
      * @param cfg The control flow graph to write
      * @throws IOException If writing fails
      */
-    public static void writeOutputs(StmtGraph<?> cfg) throws IOException {
+    public static void writeOutputs(ControlFlowGraph<?> cfg) throws IOException {
         // Ensure output directory exists
         (new java.io.File("out")).mkdirs();
 

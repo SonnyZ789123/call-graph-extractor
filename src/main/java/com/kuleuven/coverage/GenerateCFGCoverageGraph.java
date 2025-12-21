@@ -6,7 +6,7 @@ import com.kuleuven.ControlFlowGraph.MainControlFlowGraphGenerator;
 import com.kuleuven.coverage.ControlFlowGraph.Graph.CoverageGraph;
 import com.kuleuven.coverage.CoverageAgent.BlockInfo;
 import com.kuleuven.coverage.CoverageAgent.JvmDescriptorParser;
-import sootup.core.graph.StmtGraph;
+import sootup.core.graph.ControlFlowGraph;
 
 import java.io.*;
 import java.lang.reflect.Type;
@@ -56,7 +56,7 @@ public class GenerateCFGCoverageGraph {
 
             int i = 0;
             for (String methodSignature : fullyQualifiedMethodSignatures) {
-                StmtGraph<?> cfg = buildControlFlowGraph(classPath, methodSignature);
+                ControlFlowGraph<?> cfg = buildControlFlowGraph(classPath, methodSignature);
 
                 CoverageGraph coverageGraph = new CoverageGraph(cfg, blockMap, coverageCounts);
 
@@ -72,7 +72,7 @@ public class GenerateCFGCoverageGraph {
         }
     }
 
-    private static StmtGraph<?> buildControlFlowGraph(String classPath, String fullyQualifiedMethodSignature) throws IOException {
+    private static ControlFlowGraph<?> buildControlFlowGraph(String classPath, String fullyQualifiedMethodSignature) throws IOException {
         return MainControlFlowGraphGenerator.buildControlFlowGraph(classPath, fullyQualifiedMethodSignature);
     }
 

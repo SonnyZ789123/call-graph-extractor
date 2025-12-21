@@ -1,7 +1,8 @@
 package com.kuleuven.ControlFlowGraph;
 
-import sootup.core.graph.MutableBlockStmtGraph;
-import sootup.core.graph.StmtGraph;
+import sootup.core.graph.MutableBasicBlock;
+import sootup.core.graph.ControlFlowGraph;
+import sootup.core.graph.MutableBlockControlFlowGraph;
 import sootup.core.inputlocation.AnalysisInputLocation;
 import sootup.core.signatures.MethodSignature;
 import sootup.java.bytecode.frontend.inputlocation.JavaClassPathAnalysisInputLocation;
@@ -37,7 +38,7 @@ public class ExtractControlFlowGraph {
         this.method = opt.get();
     }
 
-    public StmtGraph<?> extract() {
-        return new MutableBlockStmtGraph(method.getBody().getStmtGraph());
+    public ControlFlowGraph<?> extract() {
+        return new MutableBlockControlFlowGraph(method.getBody().getControlFlowGraph());
     }
 }

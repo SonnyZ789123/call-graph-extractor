@@ -1,13 +1,12 @@
 package com.kuleuven.ICFG;
 
-import com.kuleuven.CallGraph.ICallGraph;
 import com.kuleuven.CallGraph.SootUpCallGraphWrapper;
 import com.kuleuven.metrics.CallGraphConstructionAlgorithm;
 import sootup.callgraph.CallGraph;
 import sootup.callgraph.CallGraphAlgorithm;
 import sootup.callgraph.ClassHierarchyAnalysisAlgorithm;
 import sootup.callgraph.RapidTypeAnalysisAlgorithm;
-import sootup.core.graph.StmtGraph;
+import sootup.core.graph.ControlFlowGraph;
 import sootup.core.inputlocation.AnalysisInputLocation;
 import sootup.core.signatures.MethodSignature;
 import sootup.java.bytecode.frontend.inputlocation.JavaClassPathAnalysisInputLocation;
@@ -37,7 +36,7 @@ public class ExtractICFG {
 
         SootUpCallGraphWrapper cgWrapper = new SootUpCallGraphWrapper(cg);
 
-        Map<JavaSootMethod, StmtGraph<?>> methodToCFGMap = new HashMap<>();
+        Map<JavaSootMethod, ControlFlowGraph<?>> methodToCFGMap = new HashMap<>();
         cgWrapper.getNodes().forEach(methodSignature -> {
             Optional<JavaSootMethod> opt = view.getMethod(methodSignature);
             if (opt.isEmpty()) {
@@ -46,7 +45,7 @@ public class ExtractICFG {
             }
 
             JavaSootMethod method = opt.get();
-            StmtGraph<?> cfg = method.getBody().getStmtGraph();
+            ControlFlowGraph<?> cfg = method.getBody().getControlFlowGraph();
             methodToCFGMap.put(method, cfg);
         });
 
