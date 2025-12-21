@@ -9,6 +9,19 @@ public class SootStmtGraphUtil {
      * @return A unique identifier string for the statement.
      */
     public static String getStmtId(Stmt stmt) {
-        return stmt.getPositionInfo().getStmtPosition().toString() + "||" + stmt.toString();
+        return stmt.getPositionInfo().getStmtPosition().toString() + "::" + stmt.toString();
+    }
+
+    /**
+     * Extract the statement string from a statement identifier.
+     * @param stmtId The statement identifier (e.g., [8:0-9]::$stack20 = <java.lang.System: java.io.PrintStream out>).
+     * @return The statement string, or null if not found.
+     */
+    public static String getStmtStringFromId(String stmtId) {
+        String[] parts = stmtId.split("::", 2);
+        if (parts.length == 2) {
+            return parts[1];
+        }
+        return null;
     }
 }
