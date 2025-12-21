@@ -16,6 +16,14 @@ public class CoverageEdge extends PropertyGraphEdge {
         this.internalCfgEdge = internalCfgEdge;
     }
 
+    @Override public CoverageNode getSource() {
+        return (CoverageNode) super.getSource();
+    }
+
+    @Override public CoverageNode getDestination() {
+        return (CoverageNode) super.getDestination();
+    }
+
     @Override
     public String getLabel() {
         return this.internalCfgEdge.getLabel();

@@ -50,6 +50,7 @@ public class CoverageGraph extends MutableBlockStmtGraph {
         PropertyGraph.Builder graphBuilder = new CFGCoverageGraph.Builder();
         graphBuilder.setName("cfg_coverage");
 
+        // (blockId, CoverageNode)
         Map<Integer, CoverageNode> seenBlocks = new HashMap<>();
 
         stmtGraph.getBlocks().forEach(
@@ -63,7 +64,10 @@ public class CoverageGraph extends MutableBlockStmtGraph {
                 }
                 CoverageNode sourceBlockNode = seenBlocks.get(blockInfo.blockId());
                 if (sourceBlockNode == null) {
-                    sourceBlockNode = new CoverageNode(blockInfo, currBlock);
+                    sourceBlockNode = new CoverageNode(
+                            blockInfo,
+                            currBlock,
+                            blockIdToCoverageCount.getOrDefault(blockInfo.blockId(), 0));
                     seenBlocks.put(blockInfo.blockId(), sourceBlockNode);
                     graphBuilder.addNode(sourceBlockNode);
                 }
@@ -76,10 +80,13 @@ public class CoverageGraph extends MutableBlockStmtGraph {
                     if (successorBlockInfo == null) {
                         continue;
                     }
-                    CoverageNode destinationBlockNode = seenBlocks.get(blockInfo.blockId());
+                    CoverageNode destinationBlockNode = seenBlocks.get(successorBlockInfo.blockId());
                     if (destinationBlockNode == null) {
-                        destinationBlockNode = new CoverageNode(blockInfo, currBlock);
-                        seenBlocks.put(blockInfo.blockId(), destinationBlockNode);
+                        destinationBlockNode = new CoverageNode(
+                                successorBlockInfo,
+                                currBlock,
+                                blockIdToCoverageCount.getOrDefault(successorBlockInfo.blockId(), 0));
+                        seenBlocks.put(successorBlockInfo.blockId(), destinationBlockNode);
                         graphBuilder.addNode(destinationBlockNode);
                     }
                     CoverageEdge edge = CoverageEdge.of(tailStmt, successorIndex, sourceBlockNode, destinationBlockNode);

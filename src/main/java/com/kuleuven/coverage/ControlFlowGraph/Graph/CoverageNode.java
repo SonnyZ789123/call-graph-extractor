@@ -10,10 +10,12 @@ import java.util.Objects;
 public class CoverageNode extends PropertyGraphNode {
     private final BlockInfo blockInfo;
     private final BasicBlock<?> block;
+    private final int coverageCount;
 
-    public CoverageNode(@NonNull BlockInfo blockInfo, @NonNull BasicBlock<?> block) {
+    public CoverageNode(@NonNull BlockInfo blockInfo, @NonNull BasicBlock<?> block, int coverageCount) {
         this.blockInfo = blockInfo;
         this.block = block;
+        this.coverageCount = coverageCount;
     }
 
     public BlockInfo getBlockInfo() {
@@ -24,12 +26,17 @@ public class CoverageNode extends PropertyGraphNode {
         return block;
     }
 
+    public int getCoverageCount() {
+        return coverageCount;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CoverageNode that = (CoverageNode) o;
-        return blockInfo.equals(that.getBlockInfo());
+        return blockInfo.equals(that.getBlockInfo()) &&
+                coverageCount == that.getCoverageCount();
     }
 
     @Override
