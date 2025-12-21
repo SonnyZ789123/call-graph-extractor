@@ -8,6 +8,7 @@ import sootup.core.graph.MutableBlockStmtGraph;
 import sootup.core.graph.StmtGraph;
 import sootup.core.jimple.common.stmt.Stmt;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class CoverageGraph extends MutableBlockStmtGraph {
@@ -49,6 +50,8 @@ public class CoverageGraph extends MutableBlockStmtGraph {
         PropertyGraph.Builder graphBuilder = new CFGCoverageGraph.Builder();
         graphBuilder.setName("cfg_coverage");
 
+        Map<Integer, CoverageNode> seenBlocks = new HashMap<>();
+
         stmtGraph.getBlocks().forEach(
             currBlock -> {
                 Stmt entryStmt = currBlock.getHead();
@@ -58,7 +61,12 @@ public class CoverageGraph extends MutableBlockStmtGraph {
                 if (blockInfo == null) {
                     return;
                 }
-                CoverageNode sourceBlockNode = new CoverageNode(blockInfo, currBlock);
+                CoverageNode sourceBlockNode = seenBlocks.get(blockInfo.blockId());
+                if (sourceBlockNode == null) {
+                    sourceBlockNode = new CoverageNode(blockInfo, currBlock);
+                    seenBlocks.put(blockInfo.blockId(), sourceBlockNode);
+                    graphBuilder.addNode(sourceBlockNode);
+                }
 
                 int expectedCount = tailStmt.getExpectedSuccessorCount();
                 int successorIndex = 0;
@@ -68,7 +76,12 @@ public class CoverageGraph extends MutableBlockStmtGraph {
                     if (successorBlockInfo == null) {
                         continue;
                     }
-                    CoverageNode destinationBlockNode = new CoverageNode(successorBlockInfo, currBlock);
+                    CoverageNode destinationBlockNode = seenBlocks.get(blockInfo.blockId());
+                    if (destinationBlockNode == null) {
+                        destinationBlockNode = new CoverageNode(blockInfo, currBlock);
+                        seenBlocks.put(blockInfo.blockId(), destinationBlockNode);
+                        graphBuilder.addNode(destinationBlockNode);
+                    }
                     CoverageEdge edge = CoverageEdge.of(tailStmt, successorIndex, sourceBlockNode, destinationBlockNode);
 
                     if (successorIndex >= expectedCount) {

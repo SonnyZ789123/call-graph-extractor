@@ -67,10 +67,6 @@ public class ControlFlowGraphCoverage {
             blocksById.put(nextId++, info);
         }
 
-        CoverageGraph graph = new CoverageGraph(cfg, blocksById, new HashMap<>());
-
-        System.out.println(graph.getGraph().toDotGraph());
-
         return blocksById;
     }
 

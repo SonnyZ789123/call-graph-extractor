@@ -1,14 +1,11 @@
 package com.kuleuven.coverage.ControlFlowGraph.Graph;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import com.kuleuven.coverage.ControlFlowGraph.CoverageGraphToDotConverter;
 import sootup.codepropertygraph.propertygraph.PropertyGraph;
 import sootup.codepropertygraph.propertygraph.edges.PropertyGraphEdge;
 import sootup.codepropertygraph.propertygraph.nodes.PropertyGraphNode;
-import sootup.codepropertygraph.propertygraph.util.PropertyGraphToDotConverter;
 
 public final class CFGCoverageGraph implements PropertyGraph {
     private final String name;
@@ -38,6 +35,7 @@ public final class CFGCoverageGraph implements PropertyGraph {
     }
 
     public static class Builder implements PropertyGraph.Builder {
+        private final Set<Integer> nodeBlockIds = new HashSet<>();
         private final List<PropertyGraphNode> nodes = new ArrayList<>();
         private final List<PropertyGraphEdge> edges = new ArrayList<>();
         private String name;
@@ -48,13 +46,12 @@ public final class CFGCoverageGraph implements PropertyGraph {
         }
 
         public com.kuleuven.coverage.ControlFlowGraph.Graph.CFGCoverageGraph.Builder addNode(PropertyGraphNode node) {
-            if (!(node instanceof CoverageNode)) {
+            if (!(node instanceof CoverageNode coverageNode)) {
                 throw new IllegalArgumentException("Graph can only contain coverage nodes");
             } else {
-                if (!this.nodes.contains(node)) {
+                if (!this.nodeBlockIds.contains(coverageNode.getBlockInfo().blockId())) {
                     this.nodes.add(node);
-                } else {
-                    System.out.println("already contains node: " + ((CoverageNode) node).getBlockInfo());
+                    this.nodeBlockIds.add(coverageNode.getBlockInfo().blockId());
                 }
 
                 return this;
@@ -62,12 +59,8 @@ public final class CFGCoverageGraph implements PropertyGraph {
         }
 
         public com.kuleuven.coverage.ControlFlowGraph.Graph.CFGCoverageGraph.Builder addEdge(PropertyGraphEdge edge) {
-            this.addNode(edge.getSource());
-            this.addNode(edge.getDestination());
             if (!this.edges.contains(edge)) {
                 this.edges.add(edge);
-            } else {
-                System.out.println("already contains edge: [" + edge.getSource().toString() + ", " + edge.getLabel() + ", " + edge.getDestination().toString() + "]");
             }
 
             return this;
