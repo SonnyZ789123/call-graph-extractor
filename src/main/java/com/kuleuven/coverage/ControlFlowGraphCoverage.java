@@ -32,7 +32,9 @@ public class ControlFlowGraphCoverage {
         String classPath = args[0];
         String fullyQualifiedMethodSignature = args[1];
 
-        writeCfgBlockMap(classPath, fullyQualifiedMethodSignature);
+        Map<Integer, BlockInfo> blocksById = createCfgBlockMap(classPath, fullyQualifiedMethodSignature);
+
+        writeCfgBlockMap(blocksById);
     }
 
     private static Map<Integer, BlockInfo> createCfgBlockMap(String classPath, String fullyQualifiedMethodSignature) {
@@ -66,9 +68,7 @@ public class ControlFlowGraphCoverage {
         return blocksById;
     }
 
-    public static void writeCfgBlockMap(String classPath, String fullyQualifiedMethodSignature) {
-        Map<Integer, BlockInfo> blocksById = createCfgBlockMap(classPath, fullyQualifiedMethodSignature);
-
+    public static void writeCfgBlockMap(Map<Integer, BlockInfo> blocksById) {
         Gson gson = new GsonBuilder()
                 .setPrettyPrinting()
                 .create();
