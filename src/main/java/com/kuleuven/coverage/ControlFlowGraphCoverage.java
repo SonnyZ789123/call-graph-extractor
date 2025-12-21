@@ -3,6 +3,7 @@ package com.kuleuven.coverage;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.kuleuven.ControlFlowGraph.ExtractControlFlowGraph;
+import com.kuleuven.coverage.ControlFlowGraph.Graph.CoverageGraph;
 import com.kuleuven.coverage.CoverageAgent.BlockInfo;
 import com.kuleuven.coverage.CoverageAgent.JvmDescriptorUtil;
 import com.kuleuven.coverage.CoverageAgent.SootStmtGraphUtil;
@@ -13,6 +14,7 @@ import sootup.core.jimple.common.stmt.Stmt;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -64,6 +66,10 @@ public class ControlFlowGraphCoverage {
 
             blocksById.put(nextId++, info);
         }
+
+        CoverageGraph graph = new CoverageGraph(cfg, blocksById, new HashMap<>());
+
+        System.out.println(graph.getGraph().toDotGraph());
 
         return blocksById;
     }
