@@ -3,22 +3,18 @@ package com.kuleuven.coverage;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.kuleuven.ControlFlowGraph.ExtractControlFlowGraph;
-import com.kuleuven.coverage.ControlFlowGraph.Graph.CoverageGraph;
 import com.kuleuven.coverage.CoverageAgent.BlockInfo;
 import com.kuleuven.coverage.CoverageAgent.JvmDescriptorUtil;
 import com.kuleuven.coverage.CoverageAgent.SootStmtGraphUtil;
 import sootup.core.graph.BasicBlock;
-import sootup.core.types.*;
 import sootup.core.graph.MutableBlockStmtGraph;
 import sootup.core.jimple.common.stmt.Stmt;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
-public class ControlFlowGraphCoverage {
+public class GenerateBlockMap {
     public static void main(String[] args) {
         /*
          * Expected arguments:
@@ -26,8 +22,8 @@ public class ControlFlowGraphCoverage {
          *   1: fully-qualified method signature (e.g., "<com.kuleuven._examples.Foo: int foo(int)>")
          */
         if (args.length < 2) {
-            System.out.println("Usage: java -cp <jar> com.kuleuven.coverage.ControlFlowGraphCoverage <classPath> <fullyQualifiedMethodSignature>");
-            System.out.println("Example: java -cp target/myjar.jar com.kuleuven.coverage.ControlFlowGraphCoverage ./target/classes \"<com.kuleuven._examples.Foo: int foo(int)>\"");
+            System.out.println("Usage: java -cp <jar> com.kuleuven.coverage.GenerateBlockMap <classPath> <fullyQualifiedMethodSignature>");
+            System.out.println("Example: java -cp target/myjar.jar com.kuleuven.coverage.GenerateBlockMap ./target/classes \"<com.kuleuven._examples.Foo: int foo(int)>\"");
             System.exit(1);
         }
 
