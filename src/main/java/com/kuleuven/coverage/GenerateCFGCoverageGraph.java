@@ -2,7 +2,7 @@ package com.kuleuven.coverage;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.kuleuven.ControlFlowGraph.MainControlFlowGraphGenerator;
+import com.kuleuven.ControlFlowGraph.ExtractControlFlowGraph;
 import com.kuleuven.coverage.ControlFlowGraph.Graph.CoverageGraph;
 import com.kuleuven.coverage.CoverageAgent.BlockInfo;
 import com.kuleuven.coverage.CoverageAgent.JvmDescriptorParser;
@@ -45,18 +45,14 @@ public class GenerateCFGCoverageGraph {
             @SuppressWarnings("unchecked")
             List<int[]> executionPaths = (List<int[]>) ois.readObject();
 
-            Map<Integer, Integer> coverageCounts = new HashMap<>();
-            for (int[] path : executionPaths) {
-                for (int blockId : path) {
-                    coverageCounts.merge(blockId, 1, Integer::sum);
-                }
-            }
+            Map<Integer, Integer> coverageCounts = getCoverageCounts(executionPaths);
 
             Set<String> fullyQualifiedMethodSignatures = extractMethodSignatures(blockMap.values());
 
             int i = 0;
             for (String methodSignature : fullyQualifiedMethodSignatures) {
-                ControlFlowGraph<?> cfg = buildControlFlowGraph(classPath, methodSignature);
+                ExtractControlFlowGraph extractor = new ExtractControlFlowGraph(classPath, methodSignature);
+                ControlFlowGraph<?> cfg = extractor.extract();
 
                 CoverageGraph coverageGraph = new CoverageGraph(cfg, blockMap, coverageCounts);
 
@@ -72,8 +68,14 @@ public class GenerateCFGCoverageGraph {
         }
     }
 
-    private static ControlFlowGraph<?> buildControlFlowGraph(String classPath, String fullyQualifiedMethodSignature) throws IOException {
-        return MainControlFlowGraphGenerator.buildControlFlowGraph(classPath, fullyQualifiedMethodSignature);
+    private static Map<Integer, Integer> getCoverageCounts(List<int[]> executionPaths) {
+        Map<Integer, Integer> coverageCounts = new HashMap<>();
+        for (int[] path : executionPaths) {
+            for (int blockId : path) {
+                coverageCounts.merge(blockId, 1, Integer::sum);
+            }
+        }
+        return coverageCounts;
     }
 
     private static Set<String> extractMethodSignatures(Collection<BlockInfo> blockInfoSet) {

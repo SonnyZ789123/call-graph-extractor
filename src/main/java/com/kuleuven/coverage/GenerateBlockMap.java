@@ -66,7 +66,7 @@ public class GenerateBlockMap {
         return blocksById;
     }
 
-    public static void writeCfgBlockMap(Map<Integer, BlockInfo> blocksById) {
+    private static void writeCfgBlockMap(Map<Integer, BlockInfo> blocksById) {
         Gson gson = new GsonBuilder()
                 .setPrettyPrinting()
                 .create();

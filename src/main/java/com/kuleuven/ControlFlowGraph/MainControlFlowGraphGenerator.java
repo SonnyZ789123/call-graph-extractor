@@ -39,7 +39,7 @@ public class MainControlFlowGraphGenerator {
      * @return The constructed control flow graph
      * @throws IOException If extraction fails
      */
-    public static ControlFlowGraph<?> buildControlFlowGraph(String classPath, String fullyQualifiedMethodSignature) throws IOException {
+    private static ControlFlowGraph<?> buildControlFlowGraph(String classPath, String fullyQualifiedMethodSignature) throws IOException {
         ExtractControlFlowGraph extractor = new ExtractControlFlowGraph(classPath, fullyQualifiedMethodSignature);
 
         return extractor.extract();
@@ -51,7 +51,7 @@ public class MainControlFlowGraphGenerator {
      * @param cfg The control flow graph to write
      * @throws IOException If writing fails
      */
-    public static void writeOutputs(ControlFlowGraph<?> cfg) throws IOException {
+    private static void writeOutputs(ControlFlowGraph<?> cfg) throws IOException {
         // Ensure output directory exists
         (new java.io.File("out")).mkdirs();
 

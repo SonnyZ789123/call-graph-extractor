@@ -1,6 +1,5 @@
 package com.kuleuven.ControlFlowGraph;
 
-import sootup.core.graph.MutableBasicBlock;
 import sootup.core.graph.ControlFlowGraph;
 import sootup.core.graph.MutableBlockControlFlowGraph;
 import sootup.core.inputlocation.AnalysisInputLocation;
@@ -15,6 +14,7 @@ import java.util.Optional;
 public class ExtractControlFlowGraph {
     public JavaView view;
     public JavaSootMethod method;
+    private ControlFlowGraph<?> cfg;
 
     public ExtractControlFlowGraph(String classPath, String fullyQualifiedMethodSignature) {
         // Load classes from the given classpath
@@ -39,6 +39,11 @@ public class ExtractControlFlowGraph {
     }
 
     public ControlFlowGraph<?> extract() {
-        return new MutableBlockControlFlowGraph(method.getBody().getControlFlowGraph());
+        if (cfg != null) {
+            return cfg;
+        }
+
+        cfg = new MutableBlockControlFlowGraph(method.getBody().getControlFlowGraph());
+        return cfg;
     }
 }
